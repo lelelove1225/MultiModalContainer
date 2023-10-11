@@ -1,0 +1,18 @@
+version: "3.7"
+
+services:
+  audio:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./audio_data:/audio_data
+    ports:
+      - "3000:3000"
+    command:
+      - /bin/bash
+      - -c
+      - |
+        pulseaudio -D --exit-idle-time=-1 &&
+        pacmd load-module module-pipe-source file=/dev/audio format=s16 rate=44100 channels=2 &&
+        socat tcp-listen:3000 file:/dev/audio
